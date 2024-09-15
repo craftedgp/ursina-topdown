@@ -8,3 +8,4 @@ YY-MM-DD
 - Added Collisions using Raycast
 - Added Version number on the top left of the screen
 - Added FFXA Shaders
+- Updated README.md

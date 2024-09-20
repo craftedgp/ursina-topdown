@@ -158,14 +158,15 @@ def input(key):
             btn_quit.disabled = False
             btn_quit.visible = True
         elif in_game:
-            if in_options:
-                destroy(placeholder)
-                destroy(btn_back)
-                resume_text.visible = True
-                btn_options.visible = True
-                btn_options.disabled = False
-                btn_quit.visible = True
-                btn_quit.disabled = False
+            if 'in_options' in globals:
+                if in_options:
+                  destroy(placeholder)
+                  destroy(btn_back)
+                  resume_text.visible = True
+                  btn_options.visible = True
+                  btn_options.disabled = False
+                  btn_quit.visible = True
+                  btn_quit.disabled = False
             crosshair.visible = True
             mouse.visible = False
             bg.visible = False

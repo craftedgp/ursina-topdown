@@ -23,25 +23,34 @@ in_game = True
 # ======= <Raycast Collision Handling and Gravity> =======
 def move_with_raycast(direction):
     speed = 8 * time.dt
-    ray = raycast(player.world_position, direction, ignore=(player,), distance=0.5, debug=True)
+    ray = raycast(player.world_position, 
+                  direction, 
+                  ignore=(player,), 
+                  distance=0.5, debug=True)
+    
     if not ray.hit:
         player.position += direction * speed
 
-gravity_force = 1
+gravity_force = 9.8
 is_grounded = False
 fall_speed = 0
+max_fall_speed = 100
 
 def apply_gravity():
-    global fall_speed, is_grounded
-    gravity_ray = raycast(player.world_position, Vec3(0, -1, 0), ignore=(player,), distance=0.5, debug=True)
+    global fall_speed
+    gravity_ray = raycast(player.world_position, 
+                          Vec3(0, -1, 0), 
+                          ignore=(player,), 
+                          distance=1/2, 
+                          debug=True)
 
     if not gravity_ray.hit:
-        fall_speed += gravity_force * time.dt
-        player.y -= fall_speed * time.dt
-        is_grounded = False
+        fall_speed = min(fall_speed + gravity_force * time.dt, max_fall_speed)
+        below_player_ray = raycast(player.world_position + Vec3(0, -0.5, 0), Vec3(0, -1, 0), ignore=(player,), distance=fall_speed * time.dt, debug=True)
+        if not below_player_ray.hit:
+            player.y -= fall_speed * time.dt
     else:
         fall_speed = 0
-        is_grounded = True
 # ======= </Raycast Collision Handling and Gravity> ========
 
 # ======= <MAP LAYOUT> =======
@@ -53,15 +62,32 @@ directional_light = DirectionalLight(shadow=True)
 directional_light.look_at(Vec3(1, -1, -1))
 the_giant_floor = Entity(model='cube', texture='brick', texture_scale=(50, 50), collider='box', scale=(50, .5, 50), position=(-1, -1, -1))
 block = Entity(model='cube', collider='box', position=(3, 0, 0), color=color.red)
+block2 = Entity(model='cube', collider='box', position=(-3, 0, 0), color=color.gray)
+block3 = Entity(model='sphere', collider='sphere', position=(6, 0, 1), color=color.blue)
 # hallway = Entity(model='assets/maps/hallway.gltf', position=(0, 0, 0))
+stairs1 = Entity(model='assets/maps/stairs1.gltf', position=(10, 0, 10), collider='mesh')
 # ======= </MAP LAYOUT> ======
 
 # ======= <UI> =======
+# ---- <Start Screen> ----
+controls_font = 'assets/fonts/Exo2-Regular.ttf'
+title_controls = Text('Controls', color=color.white66, position=(-.47, .25), origin=(0, 0), scale=2, font='assets/fonts/zekton rg.otf')
+frame = Entity(model='wireframe_cube', color=color.white33, position=(-.47, -.03), scale=(.4, .5), parent=camera.ui)
+walk_controls = Text('W, A, S, D', position=(-.47, .1), origin=(0, 0), font=controls_font)
+rightclick_control = Text('Right Click : Pickup/Throw weapons', position=(-.47, 0), origin=(0, 0), font=controls_font, scale=0.9)
+leftclick_control = Text('Left Click : Shoot/Melee', position=(-.47, -.1), origin=(0, 0), font=controls_font)
+swipe_control = Text('Swipe Mouse : Curve bullets', position=(-.47, -.2), origin=(0, 0), font=controls_font)
+controls_list = [title_controls, frame, walk_controls, rightclick_control, leftclick_control, swipe_control]
+for i in controls_list:
+    invoke(i.fade_out(duration=10))
+# ---- </Start Screen> ----
+
 # ---- <Button Commands> ----
 def options():
     global in_options, placeholder, btn_back
     in_options = True
     def back():
+        global in_options
         in_options = False
         destroy(placeholder)
         destroy(btn_back)
@@ -79,7 +105,7 @@ def options():
     placeholder = Text('Comming soon', color=color.red, position=(0, .2), origin=(0, 0), scale=1.5, font='assets/fonts/Exo-Regular.ttf')
     btn_back = Button(text='Back', position=(0, 0), origin=(0, 0), scale=(0.2, 0.05), on_click=back)
 # ---- </Button Commands> ----
-version = Text('PTXO Alpha-0.0.3', color=color.white, position=window.top_left, scale=1)
+version = Text('PTXO Alpha-0.0.4', color=color.white, position=window.top_left, scale=1)
 bg = Panel(origin=(0, 0), position=(0, 0), alpha=0.5, visible=False)
 bg.scale_x = camera.aspect_ratio
 bg.scale_y = camera.aspect_ratio

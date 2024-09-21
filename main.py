@@ -54,7 +54,7 @@ def apply_gravity():
 # ======= </Raycast Collision Handling and Gravity> ========
 
 # ======= <MAP LAYOUT> =======
-# camera.shader = fxaa_shader
+camera.shader = fxaa_shader
 # camera.shader = ssao_shader
 Sky()
 Entity.default_shader = lit_with_shadows_shader
@@ -65,7 +65,6 @@ block = Entity(model='cube', collider='box', position=(3, 0, 0), color=color.red
 block2 = Entity(model='cube', collider='box', position=(-3, 0, 0), color=color.gray)
 block3 = Entity(model='sphere', collider='sphere', position=(6, 0, 1), color=color.blue)
 # hallway = Entity(model='assets/maps/hallway.gltf', position=(0, 0, 0))
-stairs1 = Entity(model='assets/maps/stairs1.gltf', position=(10, 0, 10), collider='mesh')
 # ======= </MAP LAYOUT> ======
 
 # ======= <UI> =======
@@ -158,7 +157,7 @@ def input(key):
             btn_quit.disabled = False
             btn_quit.visible = True
         elif in_game:
-            if 'in_options' in globals:
+            if 'in_options' in globals():
                 if in_options:
                   destroy(placeholder)
                   destroy(btn_back)

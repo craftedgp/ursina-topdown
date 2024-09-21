@@ -67,6 +67,20 @@ block3 = Entity(model='sphere', collider='sphere', position=(6, 0, 1), color=col
 # hallway = Entity(model='assets/maps/hallway.gltf', position=(0, 0, 0))
 # ======= </MAP LAYOUT> ======
 
+# ======= <ITEMS> =======
+gun = Entity(model='assets/items/gun/gun.obj', position=(.1, 0, .5), scale=0.1, parent=player)
+# ======= </ITEMS> =======
+
+# ======= <HANDLING SHOOTING LOGIC> =======
+bullets = []
+def shoot():
+    bullet = Entity(model='sphere', color=color.yellow, scale=0.2, position=gun.world_position, collider=None)
+    bullet.direction = gun.forward  
+    bullet.speed = 100
+    bullet.previous_position = bullet.position 
+    bullets.append(bullet) 
+# ======= </HANDLING SHOOTING LOGIC> =======
+
 # ======= <UI> =======
 # ---- <Start Screen> ----
 controls_font = 'assets/fonts/Exo2-Regular.ttf'
@@ -95,7 +109,6 @@ def options():
         btn_options.disabled = False
         btn_quit.visible = True
         btn_quit.disabled = False
-        
     resume_text.visible = False
     btn_options.visible = False
     btn_options.disabled = True
@@ -104,17 +117,33 @@ def options():
     placeholder = Text('Comming soon', color=color.red, position=(0, .2), origin=(0, 0), scale=1.5, font='assets/fonts/Exo-Regular.ttf')
     btn_back = Button(text='Back', position=(0, 0), origin=(0, 0), scale=(0.2, 0.05), on_click=back)
 # ---- </Button Commands> ----
-version = Text('PTXO Alpha-0.0.4', color=color.white, position=window.top_left, scale=1)
+version = Text('PTXO Alpha-0.0.5', color=color.white, position=window.top_left, scale=1)
 bg = Panel(origin=(0, 0), position=(0, 0), alpha=0.5, visible=False)
 bg.scale_x = camera.aspect_ratio
 bg.scale_y = camera.aspect_ratio
 resume_text = Text('Press ESC again to resume', color=color.white, position=(0, 0.3), origin=(0, 0), scale=1.5, font='assets/fonts/zekton rg.otf', visible=False)
-btn_options = Button(text='Options', origin=(0, 0), position=(0, -0.1), scale=(0.2, 0.05), disabled=True, visible=False, on_click=options)
-btn_quit = Button(text='Quit', origin=(0, 0), position=(0, -0.2), scale=(0.2, 0.05), disabled=True, visible=False, on_click=application.quit)
+btn_options = Button(text='Options', origin=(0, 0), position=(0, -0.1), scale=(0.2, 0.05), disabled=True, visible=False, on_click=lambda: options() if not in_game else None)
+btn_quit = Button(text='Quit', origin=(0, 0), position=(0, -0.2), scale=(0.2, 0.05), disabled=True, visible=False, on_click=lambda: application.quit if not in_game else None)
 # ======= </UI> =======
 
 # ======= <UPDATE AND INPUT FUNCTION FOR EVERYTHING> =======
 def update():
+    # ---- <Shooting> ----
+    for bullet in bullets:
+        bullet.previous_position = bullet.position 
+        bullet.position += bullet.direction * bullet.speed * time.dt
+
+        ray = raycast(bullet.previous_position, (bullet.position - bullet.previous_position).normalized(), ignore=(bullet,), distance=.3, debug=True)
+        
+        if ray.hit: 
+            destroy(bullet)  
+            bullets.remove(bullet)  
+            return
+        
+        if distance(player.position, bullet.position) > 40:
+            destroy(bullet) 
+            bullets.remove(bullet)
+    # ---- </Shooting> ----
     # ---- <Gravity> ----
     apply_gravity()
     # ---- </Gravity> ----
@@ -143,6 +172,10 @@ def update():
     # ---- </Controls> ----
 
 def input(key):
+    # ---- <Shooting> ----
+    if key == 'left mouse down':
+        shoot()
+    # ---- </Shooting> ----
     # ---- <Pause Menu> ----
     global in_game
     if key == 'escape':

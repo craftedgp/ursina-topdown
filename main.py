@@ -129,6 +129,7 @@ btn_quit = Button(text='Quit', origin=(0, 0), position=(0, -0.2), scale=(0.2, 0.
 # ======= <UPDATE AND INPUT FUNCTION FOR EVERYTHING> =======
 def update():
     # ---- <Shooting> ----
+    # <Deagle>
     for bullet in bullets:
         bullet.previous_position = bullet.position 
         bullet.position += bullet.direction * bullet.speed * time.dt
@@ -143,6 +144,7 @@ def update():
         if distance(player.position, bullet.position) > 40:
             destroy(bullet) 
             bullets.remove(bullet)
+    # </Deagle>
     # ---- </Shooting> ----
     # ---- <Gravity> ----
     apply_gravity()

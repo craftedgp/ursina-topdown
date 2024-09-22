@@ -117,7 +117,7 @@ def options():
     placeholder = Text('Comming soon', color=color.red, position=(0, .2), origin=(0, 0), scale=1.5, font='assets/fonts/Exo-Regular.ttf')
     btn_back = Button(text='Back', position=(0, 0), origin=(0, 0), scale=(0.2, 0.05), on_click=back)
 # ---- </Button Commands> ----
-version = Text('PTXO Alpha-0.0.5', color=color.white, position=window.top_left, scale=1)
+version = Text('PTXO Alpha-0.0.6', color=color.white, position=window.top_left, scale=1)
 bg = Panel(origin=(0, 0), position=(0, 0), alpha=0.5, visible=False)
 bg.scale_x = camera.aspect_ratio
 bg.scale_y = camera.aspect_ratio
@@ -130,20 +130,21 @@ btn_quit = Button(text='Quit', origin=(0, 0), position=(0, -0.2), scale=(0.2, 0.
 def update():
     # ---- <Shooting> ----
     # <Deagle>
-    for bullet in bullets:
-        bullet.previous_position = bullet.position 
-        bullet.position += bullet.direction * bullet.speed * time.dt
+    if in_game:
+        for bullet in bullets:
+            bullet.previous_position = bullet.position 
+            bullet.position += bullet.direction * bullet.speed * time.dt
 
-        ray = raycast(bullet.previous_position, (bullet.position - bullet.previous_position).normalized(), ignore=(bullet,), distance=.3, debug=True)
-        
-        if ray.hit: 
-            destroy(bullet)  
-            bullets.remove(bullet)  
-            return
-        
-        if distance(player.position, bullet.position) > 40:
-            destroy(bullet) 
-            bullets.remove(bullet)
+            ray = raycast(bullet.previous_position, (bullet.position - bullet.previous_position).normalized(), ignore=(bullet,), distance=.3, debug=True)
+
+            if ray.hit: 
+                destroy(bullet)  
+                bullets.remove(bullet)  
+                return
+
+            if distance(player.position, bullet.position) > 40:
+                destroy(bullet) 
+                bullets.remove(bullet)
     # </Deagle>
     # ---- </Shooting> ----
     # ---- <Gravity> ----
@@ -156,7 +157,8 @@ def update():
     # ---- <Update Crosshair and Player Position/Roation> ----
     camera.position = lerp(camera.position, (player.x, player.y + 20, player.z), 10 * time.dt)
     crosshair.position = mouse.position
-    player.look_at_xz(Vec3(mouse.x + player.x, 0, mouse.y + player.z))
+    if in_game:
+        player.look_at_xz(Vec3(mouse.x + player.x, 0, mouse.y + player.z))
     # ---- </Update Crosshair and Player Position/Roation> ----
     # ---- <Controls> ----
     if in_game:
@@ -174,12 +176,15 @@ def update():
     # ---- </Controls> ----
 
 def input(key):
+    # ---- <Making variables global if needed, always do it here before anything> ----
+    global in_game
+    # ---- </Making variables global if needed, always do it here before anything> ----
     # ---- <Shooting> ----
-    if key == 'left mouse down':
-        shoot()
+    if in_game:
+        if key == 'left mouse down':
+            shoot()
     # ---- </Shooting> ----
     # ---- <Pause Menu> ----
-    global in_game
     if key == 'escape':
         in_game = not in_game
         if not in_game:

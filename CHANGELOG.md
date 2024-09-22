@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 YY-MM-DD
 
+## [Alpha 0.0.6] 2024-09-22
+- Fixed a bug where the player could shoot even when the game is paused
+- Player stops following the mouse position when the game is paused
+
+
 ## [Alpha 0.0.5] 2024-09-21
 - Added a gun to the player
 - Added shooting mechanics

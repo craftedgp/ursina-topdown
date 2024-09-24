@@ -6,14 +6,14 @@ from ursina.shaders import lit_with_shadows_shader, fxaa_shader, ssao_shader
 
 # ======= </CONFIG> =======
 
-app = Ursina(title='PTXO', fullscreen=True, borderless=False, show_ursina_splash=True)
+app = Ursina(title='Flux Takedown', fullscreen=True, borderless=False, show_ursina_splash=True)
 
 # ======= <Top Down Controller> =======
 mouse.visible = False
 idle_animation = Actor('assets/animations/player/idle_combat.gltf')
-idle_animation.loop('UE4_Mannequin_Skeleton|UE4_Mannequin_Skeleton|Combat_Idle')
+idle_animation.loop('Armature|mixamo.com|Layer0')
 sprint_actor = Actor('assets/animations/player/sprint.gltf')
-sprint_actor.loop('UE4_Mannequin_Skeleton|UE4_Mannequin_Skeleton|Sprint')
+sprint_actor.loop('Armature|mixamo.com|Layer0')
 player = Entity(model=idle_animation, collider='box', position=(0, 100, 0))
 crosshair = Entity(model='quad', texture='assets/gfx/crosshair.png', parent=camera.ui, scale=(.1, .1), position=(0, 0, 2), visible=True)
 camera.rotation_x = 90
@@ -117,7 +117,7 @@ def options():
     placeholder = Text('Comming soon', color=color.red, position=(0, .2), origin=(0, 0), scale=1.5, font='assets/fonts/Exo-Regular.ttf')
     btn_back = Button(text='Back', position=(0, 0), origin=(0, 0), scale=(0.2, 0.05), on_click=back)
 # ---- </Button Commands> ----
-version = Text('PTXO Alpha-0.0.6', color=color.white, position=window.top_left, scale=1)
+version = Text('Flux Takedown Alpha-0.0.6', color=color.white, position=window.top_left, scale=1)
 bg = Panel(origin=(0, 0), position=(0, 0), alpha=0.5, visible=False)
 bg.scale_x = camera.aspect_ratio
 bg.scale_y = camera.aspect_ratio

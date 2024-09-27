@@ -55,7 +55,7 @@ def apply_gravity():
     gravity_ray = raycast(player.world_position, 
                           Vec3(0, -1, 0), 
                           ignore=(player,), 
-                          distance=1/2, 
+                          distance=player.scale_y,
                           debug=True)
 
     if not gravity_ray.hit:
@@ -64,9 +64,9 @@ def apply_gravity():
         below_player_ray = raycast(player.world_position + Vec3(0, -0.5, 0), 
                                    Vec3(0, -1, 0), 
                                    ignore=(player,), 
-                                   distance=0.6, 
+                                   distance=player.scale_y * time.dt, 
                                    debug=True)
-        
+
         if not below_player_ray.hit:
             player.y -= fall_speed * time.dt
     else:

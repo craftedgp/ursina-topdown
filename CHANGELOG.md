@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 YY-MM-DD
 
+## [Alpha 0.0.7] 2024-09-27
+- Added a new original lore accurate player model with soooooo many animations
+- Added falling animations
+- Fixed a bug where the player could still fall even if the game is paused
+
 ## [NEWS]
 I renamed this game/project from **PTXO** to **Flux Takedown** because I don't like the fact that PTXO ressembles OTXO a lot and I don't want the game to be called a rip-off, I simply was inspired by OTXO and Tron:Legacy to make this project, so I renamed it something more original and gives a sci-fi gameplay feel to it. (did i cook ?)
 

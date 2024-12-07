@@ -8,7 +8,6 @@ YY-MM-DD
 - Fixed some bugs
 
 ## [Alpha 0.0.7] 2024-09-27
-- Added a new original lore accurate player model with soooooo many animations
 - Added falling animations
 - Fixed a bug where the player could still fall even if the game is paused
 

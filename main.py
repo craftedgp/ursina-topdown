@@ -1,14 +1,15 @@
-# ==== GAME MADE BY ====
+# you can delete this :(
+# =====   MADE BY  =====
 # ====   CRAFTEDGP  ====
-# ====     A.K.A    ====
-# ====  AETHERFLARE ====
-# ====     GAMES    ====
+# ====     a.k.a    ====
+# =====  _gamedev  =====
+
 
 from ursina import *
 from direct.actor.Actor import Actor
 from ursina.shaders import lit_with_shadows_shader, fxaa_shader, ssao_shader
 
-app = Ursina(title='Flux Takedown', fullscreen=True, borderless=False, show_ursina_splash=True)
+app = Ursina(title='Ursina TopDown Template', fullscreen=True, borderless=False, show_ursina_splash=True)
 
 # ======= <Top Down Controller> =======
 # ---- <Animations> ----
@@ -25,12 +26,14 @@ falling_unarmed_animation.setHpr(180, 0, 0)
 # </Correct broken animations>
 # ---- </Animations> ----
 mouse.visible = False
-player = Entity(model=idle_animation, collider='box', position=(0, 100, 0))
+player = Entity(model=idle_animation, position=(0, 100, 0))
+equiped_gun = Entity(model='assets/items/gun/gun.obj', position=(.1, 0, .5), scale=0.1, parent=player)
 crosshair = Entity(model='quad', texture='assets/gfx/crosshair.png', parent=camera.ui, scale=(.1, .1), position=(0, 0, 2), visible=True)
 camera.rotation_x = 90
 in_game = True
 time_interval = 0.01
 previous_position = player.position
+# EditorCamera()
 # ======= </Top Down Controller> ======
 
 # ======= <Raycast Collision Handling and Gravity> =======
@@ -38,8 +41,9 @@ def move_with_raycast(direction):
     speed = 3 * time.dt
     ray = raycast(player.world_position, 
                   direction, 
-                  ignore=(player,), 
-                  distance=0.5, debug=True)
+                  ignore=(player,),
+                  distance=0.5,
+                  debug=True)
 
     if not ray.hit:
         player.position += direction * speed
@@ -54,8 +58,8 @@ def apply_gravity():
     global is_grounded
     gravity_ray = raycast(player.world_position, 
                           Vec3(0, -1, 0), 
-                          ignore=(player,), 
-                          distance=player.scale_y,
+                          ignore=(player,),
+                          distance=1/2,
                           debug=True)
 
     if not gravity_ray.hit:
@@ -63,8 +67,8 @@ def apply_gravity():
         fall_speed = min(fall_speed + gravity_force * time.dt, max_fall_speed)
         below_player_ray = raycast(player.world_position + Vec3(0, -0.5, 0), 
                                    Vec3(0, -1, 0), 
-                                   ignore=(player,), 
-                                   distance=player.scale_y * time.dt, 
+                                   ignore=(player,),
+                                   distance=fall_speed * time.dt, 
                                    debug=True)
 
         if not below_player_ray.hit:
@@ -76,7 +80,7 @@ def apply_gravity():
 # ======= </Raycast Collision Handling and Gravity> ========
 
 # ======= <MAP LAYOUT> =======
-# camera.shader = fxaa_shader
+camera.shader = fxaa_shader
 # camera.shader = ssao_shader
 Sky()
 Entity.default_shader = lit_with_shadows_shader
@@ -86,18 +90,13 @@ the_giant_floor = Entity(model='cube', texture='brick', texture_scale=(50, 50), 
 block = Entity(model='cube', collider='box', position=(3, 0, 0), color=color.red)
 block2 = Entity(model='cube', collider='box', position=(-3, 0, 0), color=color.gray)
 block3 = Entity(model='sphere', collider='sphere', position=(6, 0, 1), color=color.blue)
-# hallway = Entity(model='assets/maps/hallway.gltf', position=(0, 0, 0))
 # ======= </MAP LAYOUT> ======
-
-# ======= <ITEMS> =======
-gun = Entity(model='assets/items/gun/gun.obj', position=(.1, 0, .5), scale=0.1, parent=player)
-# ======= </ITEMS> =======
 
 # ======= <HANDLING SHOOTING LOGIC> =======
 bullets = []
 def shoot():
-    bullet = Entity(model='sphere', color=color.yellow, scale=0.2, position=gun.world_position, collider=None)
-    bullet.direction = gun.forward
+    bullet = Entity(model='sphere', color=color.yellow, scale=0.2, position=equiped_gun.world_position, collider=None)
+    bullet.direction = equiped_gun.forward
     bullet.speed = 300
     bullet.previous_position = bullet.position
     bullets.append(bullet)
@@ -139,7 +138,7 @@ def options():
     placeholder = Text('Comming soon', color=color.red, position=(0, .2), origin=(0, 0), scale=1.5, font='assets/fonts/Exo-Regular.ttf')
     btn_back = Button(text='Back', position=(0, 0), origin=(0, 0), scale=(0.2, 0.05), on_click=back)
 # ---- </Button Commands> ----
-version = Text('Flux Takedown Alpha-0.0.7', color=color.white, position=window.top_left, scale=1)
+version = Text('Urisna TopDown Template V1.0', color=color.white, position=window.top_left, scale=1)
 bg = Panel(origin=(0, 0), position=(0, 0), alpha=0.5, visible=False)
 bg.scale_x = camera.aspect_ratio
 bg.scale_y = camera.aspect_ratio
@@ -151,7 +150,7 @@ btn_quit = Button(text='Quit', origin=(0, 0), position=(0, -0.2), scale=(0.2, 0.
 # ======= <UPDATE AND INPUT FUNCTION FOR EVERYTHING> =======
 def update():
     # ---- <Shooting> ----
-    # <Deagle>
+    # <Gun>
     if in_game:
         for bullet in bullets:
             bullet.previous_position = bullet.position
@@ -167,7 +166,7 @@ def update():
             if distance(player.position, bullet.position) > 40:
                 destroy(bullet)
                 bullets.remove(bullet)
-    # </Deagle>
+    # </Gun>
     # ---- </Shooting> ----
     # ---- <Gravity> ----
     if in_game:
@@ -198,14 +197,11 @@ def update():
     global previous_position
     global is_grounded
 
-    if is_grounded:
-        if player.position != previous_position:
-            player.model = sprint_animation
-        else:  
-            player.model = idle_animation
-    else:
-        player.model = falling_unarmed_animation
-
+    if player.position != previous_position:
+        player.model = sprint_animation
+    else:  
+        player.model = idle_animation
+    
     invoke(lambda: store_position(), delay=time_interval)
 
     def store_position():
@@ -254,7 +250,7 @@ def input(key):
             btn_quit.visible = False
     # ---- </Pause Menu> ----
 
-    # ---- <Animation handling> ----
+    # ---- <Old Animation handling method> ----
     # if in_game:
         # if held_keys['w']:
             # player.model = sprint_animation
@@ -266,6 +262,6 @@ def input(key):
             # player.model = sprint_animation
         # else:
             # player.model = idle_animation
-    # ---- </Animation handling> ----
+    # ---- </Old Animation handling method> ----
 # ======= </UPDATE AND INPUT FUNCTION FOR EVERYTHING> ======
 app.run()
